@@ -8,12 +8,12 @@ fun main(args: Array<String>) {
 	val columns = List(lines.size) { m -> rows.map { it[m] } }
 	val visible = List(lines.size) { MutableList(lines.size) { false } }
 	
-	fun List<Int>.visibleAfter(i: Int) = drop(i + 1).none { it >= get(i) } || reversed().drop(size - i).none { it >= get(i) }
+	fun List<Int>.visible(i: Int) = drop(i + 1).none { it >= get(i) } || reversed().drop(size - i).none { it >= get(i) }
 	
 	var scenicScore = -1
 	for (i in rows.indices) {
 		for (j in columns.indices) {
-			visible[i][j] = rows[i].visibleAfter(j) || columns[j].visibleAfter(i)
+			visible[i][j] = rows[i].visible(j) || columns[j].visible(i)
 			scenicScore = maxOf(scenicScore, (i to j).scenicScore(rows[i], columns[j]))
 		}
 	}
