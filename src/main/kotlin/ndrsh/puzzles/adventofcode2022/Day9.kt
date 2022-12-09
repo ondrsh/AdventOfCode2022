@@ -23,7 +23,7 @@ fun solve(lines: List<String>, nKnots: Int) {
 				val (tail, head) = knots[i] to knots[i - 1]
 				if (tail isNotAdjacentTo head) {
 					val vec = head - tail
-					knots[i] = head - vec.intNorm()
+					knots[i] = head - vec.normalized()
 				}
 			}
 			visited.add(knots.last())
