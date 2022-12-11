@@ -12,10 +12,7 @@ fun main(args: Array<String>) {
 
 private fun List<String>.solve(part2: Boolean) {
 	val monkeys = mutableListOf<Monkey>()
-	val allDivs = mutableListOf<Long>()
-	
-	parseAndFill(allDivs, monkeys)
-	val mod = allDivs.reduce(Long::times)
+	val mod = parseAndFill(monkeys)
 	
 	fun Monkey.handle() {
 		while (items.isNotEmpty()) {
@@ -36,7 +33,8 @@ private fun List<String>.solve(part2: Boolean) {
 	println(ans)
 }
 
-private fun List<String>.parseAndFill(allDivs: MutableList<Long>, monkeys: MutableList<Monkey>) {
+private fun List<String>.parseAndFill(monkeys: MutableList<Monkey>): Long {
+	val allDivs = mutableListOf<Long>()
 	windowed(6, 7) {
 		val items = it[1].getAllLongs()
 		val opstr = it[2].substringAfter("new = old ")
@@ -65,6 +63,7 @@ private fun List<String>.parseAndFill(allDivs: MutableList<Long>, monkeys: Mutab
 		                   ifTrue = ifTrue,
 		                   ifFalse = ifFalse))
 	}
+	return allDivs.reduce(Long::times)
 }
 
 data class Monkey(val items: MutableList<Long>,
