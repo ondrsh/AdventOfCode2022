@@ -5,29 +5,39 @@ import java.io.File
 
 fun main(args: Array<String>) {
 	val lines = File("/home/ndrsh/software/adventofcode/2022/11").readLines()
-	lines.solve(part1 = true)
-	lines.solve(part1 = false)
+	solve(lines, part1 = true)
+	solve(lines, part1 = false)
 }
 
 data class Monkey(val items: MutableList<Long>,
                   var nHandled: Long = 0,
                   val op: (Long) -> Long,
-                  val test: (Long) -> Boolean,
+                  val divBy: Long,
                   val ifTrue: Int,
                   val ifFalse: Int)
 
-private fun List<String>.solve(part1: Boolean) {
+private fun solve(lines: List<String>, part1: Boolean) {
 	val n = if (part1) 20 else 10000
 	val k = if (part1) 3 else 1
-	val monkeys = mutableListOf<Monkey>()
-	val product = parseAndFill(monkeys)
+	val monkeys: List<Monkey> = lines.windowed(size = 6, step = 7).map {
+		val opString = it[2].substringAfter("new = old ")
+		Monkey(items = it[1].getAllLongs().toMutableList(),
+		       divBy = it[3].split(" ").last().toLong(),
+		       ifTrue = it[4].split(" ").last().toInt(),
+		       ifFalse = it[5].split(" ").last().toInt(),
+		       op = { a: Long ->
+			       val b = if (opString.contains("old")) a else opString.split(" ").last().toLong()
+			       if (opString.contains('*')) a*b
+			       else a + b
+		       })
+	}
+	val product = monkeys.map { it.divBy }.reduce(Long::times)
 	
 	fun Monkey.handle() {
 		while (items.isNotEmpty()) {
 			val item = items.removeFirst()
-			var v = op(item)
-			v /= k
-			val target = if (test(v)) monkeys[ifTrue] else monkeys[ifFalse]
+			val v = op(item)/k
+			val target = if (v%divBy == 0L) monkeys[ifTrue] else monkeys[ifFalse]
 			target.items.add(v%product)
 			nHandled++
 		}
@@ -43,31 +53,4 @@ private fun List<String>.solve(part1: Boolean) {
 			.reduce(Long::times)
 	
 	println(ans)
-}
-
-private fun List<String>.parseAndFill(monkeys: MutableList<Monkey>): Long {
-	var product = 1L
-	
-	windowed(size = 6, step = 7) { lines ->
-		val items = lines[1].getAllLongs().toMutableList()
-		val opstr = lines[2].substringAfter("new = old ")
-		val divBy = lines[3].split(" ").last().toLong()
-		val ifTrue = lines[4].split(" ").last().toInt()
-		val ifFalse = lines[5].split(" ").last().toInt()
-		product *= divBy
-		
-		val op: (Long) -> Long = { a ->
-			val b = if (opstr.contains("old")) a else opstr.split(" ").last().toLong()
-			if (opstr.contains('*')) a*b
-			else a + b
-		}
-		
-		monkeys.add(Monkey(items = items,
-		                   op = op,
-		                   test = { it%divBy == 0L },
-		                   ifTrue = ifTrue,
-		                   ifFalse = ifFalse))
-	}
-
-	return product
 }
