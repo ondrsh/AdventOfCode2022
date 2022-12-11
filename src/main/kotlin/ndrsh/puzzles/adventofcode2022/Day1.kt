@@ -7,18 +7,12 @@ import java.io.File
 fun main(args: Array<String>) {
 	val lines = File("/home/ndrsh/software/adventofcode/2022/1").readLines()
 	
-	val elves = mutableListOf<MutableList<Int>>()
-	var c = 0
-	elves.add(mutableListOf())
-	lines.forEach {
-		if (it.none { it.isDigit() }) {
-			c++
-			elves.add(mutableListOf())
-		} else {
-			elves[c].add(it.toInt())
-		}
-	}
+	// separate calories by elf
+	val elfCals: List<List<Int>> = lines.splitBy { it.isEmpty() }.map { it.map { it.toInt() } }
 	
-	lines.splitBy { it == "" }.map { it.map { it.toInt() } }.maxBy { it.sum() }.sum().let { println(it) }
-	lines.splitBy { it == "" }.map { it.map { it.toInt() } }.sortedByDescending { it.sum() }.take(3).flatten().sum().let { println(it) }
+	val ans1 = elfCals.maxBy { it.sum() }.sum()
+	val ans2 = elfCals.sortedByDescending { it.sum() }.take(3).flatten().sum()
+	
+	println(ans1)
+	println(ans2)
 }
