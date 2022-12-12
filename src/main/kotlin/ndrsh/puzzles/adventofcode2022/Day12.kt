@@ -2,44 +2,41 @@ package ndrsh.puzzles.adventofcode2022
 
 import ndrsh.puzzles.*
 import java.io.File
-import java.util.PriorityQueue
+
+var mat = mutableListOf<MutableList<Char>>()
 
 fun main(args: Array<String>) {
-	val mat = File("/home/ndrsh/software/adventofcode/2022/12").readLines().toMutableMatrix()
-	println(solve(mat, part2 = false))
-	println(solve(mat, part2 = true))
+	mat = File("/home/ndrsh/software/adventofcode/2022/12").readLines().toMutableMatrix()
+	println(solve(part2 = false))
+	println(solve(part2 = true))
 }
 
-fun setStarts(p: Point, mat: MutableList<MutableList<Char>>) {
+fun setAllStarts(p: Point) {
 	mat[p] = 'S'
-	p.cardinalAdjacents().filter { it in mat && mat[it] == 'a' }.forEach { setStarts(it, mat) }
+	p.cardinalAdjacents().filter { it in mat && mat[it] == 'a' }.forEach { setAllStarts(it) }
 }
 
-private fun solve(mat: MutableList<MutableList<Char>>, part2: Boolean): Int {
+private fun solve(part2: Boolean): Int {
 	val start = mat.points().single { mat[it] == 'S' }
-	val end = mat.points().single { mat[it] == 'E' }
-	if (part2) setStarts(start, mat)
-	val starts = mat.points().filter { mat[it] == 'S' }
-	return starts.minOf { dijkstra(it, end, mat) }
+	if (part2) setAllStarts(start)
+	return mat.points().filter { mat[it] == 'S' }.minOf { dijkstra(it) }
 }
 
-private fun dijkstra(start: Point, end: Point, mat: List<List<Char>>): Int {
-	val minSteps = mat.points().associateWith { Int.MAX_VALUE }.toMutableMap()
-	val queue = PriorityQueue { a: Point, b: Point -> minSteps[a]!!.compareTo(minSteps[b]!!) }
+private fun dijkstra(start: Point): Int {
+	val steps = mat.points().associateWith { Int.MAX_VALUE }.toMutableMap()
+	val queue = mutableListOf(start)
 	var ans = mat.nCols*mat.nRows
-	minSteps[start] = 0
-	queue.add(start)
+	steps[start] = 0
 	while (queue.isNotEmpty()) {
-		val p: Point = queue.poll()
-		val step = 1 + minSteps[p]!!
+		val p: Point = queue.removeFirst()
+		val step = 1 + steps[p]!!
 		val adjs = p.cardinalAdjacents().filter { it in mat }
-		if (end in adjs && mat[p] >= 'y') {
-			ans = minOf(ans, step)
-		}
+		fun List<Point>.hasEnd() = any { mat[it] == 'E' } && mat[p] >= 'y'
+		if (adjs.hasEnd()) ans = minOf(ans, step)
 		adjs.filter { mat[it] <= mat[p] + 1 || p == start }
-				.filter { step < minOf(ans, minSteps[it] ?: Int.MAX_VALUE) }
+				.filter { it !in steps || step < minOf(ans, steps[it]!!) }
 				.forEach {
-					minSteps[it] = step
+					steps[it] = step
 					queue.add(it)
 				}
 	}
