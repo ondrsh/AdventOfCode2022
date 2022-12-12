@@ -24,23 +24,21 @@ private fun solve(mat: MutableList<MutableList<Char>>, part2: Boolean): Int {
 }
 
 private fun dijkstra(start: Point, end: Point, mat: List<List<Char>>): Int {
-	val minSteps = mat.points()
-			.associateWith { Int.MAX_VALUE }
-			.toMutableMap()
+	val minSteps = mat.points().associateWith { Int.MAX_VALUE }.toMutableMap()
 	minSteps[start] = 0
 	val queue = PriorityQueue { a: Point, b: Point -> minSteps[a]!!.compareTo(minSteps[b]!!) }.apply { add(start) }
 	var ans = mat.nCols*mat.nRows
 	outer@ while (queue.isNotEmpty()) {
 		val p: Point = queue.poll()
-		val step = minSteps[p]!!
+		val step = 1 + minSteps[p]!!
 		for (adj in p.cardinalAdjacents().filter { it in mat }) {
 			if (adj == end && mat[p] == 'y') {
-				ans = minOf(ans, step + 1)
+				ans = minOf(ans, step)
 				continue@outer
 			}
 			if (mat[p] == 'S' || mat[adj] <= mat[p] + 1) {
-				if (step - 1 < ans && (minSteps[adj] ?: Int.MAX_VALUE) > step + 1) {
-					minSteps[adj] = step + 1
+				if (step + 1 < ans && (minSteps[adj] ?: Int.MAX_VALUE) > step) {
+					minSteps[adj] = step
 					queue.add(adj)
 				}
 			}
