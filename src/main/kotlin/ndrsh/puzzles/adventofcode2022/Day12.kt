@@ -1,40 +1,40 @@
 package ndrsh.puzzles.adventofcode2022
 
-import ndrsh.puzzles.*
 import java.io.File
 
-var mat = mutableListOf<MutableList<Char>>()
+val arr = File("/home/ndrsh/software/adventofcode/2022/12").readLines().joinToString("").toCharArray()
+val cols = 114
+
+fun adjs(k: Int) = buildList {
+	if (k - cols > 0) add(k - cols)
+	if (k + cols < arr.size) add(k + cols)
+	if (k%cols != 0) add(k - 1)
+	if (k%cols != cols - 1) add(k + 1)
+}
 
 fun main(args: Array<String>) {
-	mat = File("/home/ndrsh/software/adventofcode/2022/12").readLines().toMutableMatrix()
-	println(solve(part2 = false))
-	println(solve(part2 = true))
+	val start = arr.indexOf('S')
+	val ans1 = bfs(start)
+	setAllStarts(start)
+	val ans2 = arr.indices.filter { arr[it] == 'S' }.map { bfs(it) }.min()
+	println(ans1)
+	println(ans2)
 }
 
-fun setAllStarts(p: Point) {
-	mat[p] = 'S'
-	p.cardinalAdjacents().filter { it in mat && mat[it] == 'a' }.forEach { setAllStarts(it) }
+fun setAllStarts(start: Int) {
+	arr[start] = 'S'
+	adjs(start).filter { arr[it] == 'a' }.forEach { setAllStarts(it) }
 }
 
-private fun solve(part2: Boolean): Int {
-	val start = mat.points().single { mat[it] == 'S' }
-	if (part2) setAllStarts(start)
-	return mat.points().filter { mat[it] == 'S' }.minOf { bfs(it) }
-}
-
-private fun bfs(start: Point): Int {
-	val steps = mat.points().associateWith { Int.MAX_VALUE }.toMutableMap()
+private fun bfs(start: Int): Int {
+	val steps = IntArray(arr.size) { Int.MAX_VALUE }.apply { set(start, 0) }
+	var ans = arr.size
 	val queue = mutableListOf(start)
-	var ans = mat.nCols*mat.nRows
-	steps[start] = 0
 	while (queue.isNotEmpty()) {
-		val p: Point = queue.removeFirst()
-		val step = 1 + steps[p]!!
-		val adjs = p.cardinalAdjacents().filter { it in mat }
-		fun List<Point>.hasEnd() = any { mat[it] == 'E' } && mat[p] >= 'y'
-		if (adjs.hasEnd()) ans = minOf(ans, step)
-		adjs.filter { mat[it] <= mat[p] + 1 || p == start }
-				.filter { it !in steps || step < minOf(ans, steps[it]!!) }
+		val k = queue.removeFirst()
+		val step = 1 + steps[k]
+		if (adjs(k).any { arr[it] == 'E' } && arr[k] >= 'y') ans = minOf(ans, step)
+		adjs(k).filter { step < minOf(ans, steps[it]) && (arr[it] <= arr[k] + 1 || arr[k] == 'S') }
 				.forEach {
 					steps[it] = step
 					queue.add(it)
