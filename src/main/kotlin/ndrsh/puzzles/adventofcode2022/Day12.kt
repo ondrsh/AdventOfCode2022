@@ -25,24 +25,23 @@ private fun solve(mat: MutableList<MutableList<Char>>, part2: Boolean): Int {
 
 private fun dijkstra(start: Point, end: Point, mat: List<List<Char>>): Int {
 	val minSteps = mat.points().associateWith { Int.MAX_VALUE }.toMutableMap()
-	minSteps[start] = 0
-	val queue = PriorityQueue { a: Point, b: Point -> minSteps[a]!!.compareTo(minSteps[b]!!) }.apply { add(start) }
+	val queue = PriorityQueue { a: Point, b: Point -> minSteps[a]!!.compareTo(minSteps[b]!!) }
 	var ans = mat.nCols*mat.nRows
-	outer@ while (queue.isNotEmpty()) {
+	minSteps[start] = 0
+	queue.add(start)
+	while (queue.isNotEmpty()) {
 		val p: Point = queue.poll()
 		val step = 1 + minSteps[p]!!
-		for (adj in p.cardinalAdjacents().filter { it in mat }) {
-			if (adj == end && mat[p] == 'y') {
-				ans = minOf(ans, step)
-				continue@outer
-			}
-			if (mat[p] == 'S' || mat[adj] <= mat[p] + 1) {
-				if (step + 1 < ans && (minSteps[adj] ?: Int.MAX_VALUE) > step) {
-					minSteps[adj] = step
-					queue.add(adj)
-				}
-			}
+		val adjs = p.cardinalAdjacents().filter { it in mat }
+		if (end in adjs && mat[p] >= 'y') {
+			ans = minOf(ans, step)
 		}
+		adjs.filter { mat[it] <= mat[p] + 1 || p == start }
+				.filter { step < minOf(ans, minSteps[it] ?: Int.MAX_VALUE) }
+				.forEach {
+					minSteps[it] = step
+					queue.add(it)
+				}
 	}
 	return ans
 }
