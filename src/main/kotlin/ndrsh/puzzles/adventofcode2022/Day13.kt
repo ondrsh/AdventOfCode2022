@@ -17,17 +17,21 @@ fun main(args: Array<String>) {
 }
 
 fun inOrder(l: MutableList<Char>, r: MutableList<Char>): Boolean {
-	fun MutableList<Char>.addBrackets(len: Int) = apply { add(len, ']'); add(0, '[') }
-	fun List<Char>.num(): Int? = if (!this.first().isDigit()) null else this.takeWhile { it.isDigit() }.joinToString("").toInt()
+	fun List<Char>.getNumber(): Int? = if (!first().isDigit()) null else takeWhile { it.isDigit() }.joinToString("").toInt()
+	fun MutableList<Char>.addBrackets(len: Int) {
+		add(len, ']')
+		add(0, '[')
+	}
 	
-	if (l.first() == '[' && r.num() != null) r.addBrackets(r.num().toString().length)
-	if (r.first() == '[' && l.num() != null) l.addBrackets(l.num().toString().length)
+	val (lk, rk) = l.getNumber() to r.getNumber()
+	if (l[0] == '[' && rk != null) r.addBrackets(1+rk/10)
+	if (r[0] == '[' && lk != null) l.addBrackets(1+lk/10)
 	
 	return when {
-		l[0] == ']' && r[0] != ']'         -> true
-		l[0] != ']' && r[0] == ']'         -> false
-		l.num() == (r.num() ?: -1)         -> inOrder(l.subList(l.num().toString().length, l.size), r.subList(r.num().toString().length, r.size))
-		l.num() != null && r.num() != null -> l.num()!! < r.num()!!
-		else                               -> inOrder(l.subList(1, l.size), r.subList(1, r.size))
+		l[0] == ']' && r[0] != ']' -> true
+		l[0] != ']' && r[0] == ']' -> false
+		lk == (rk ?: -1)           -> inOrder(l.subList(1+lk/10, l.size), r.subList(1+rk!!/10, r.size))
+		lk != null && rk != null   -> lk < rk
+		else                       -> inOrder(l.subList(1, l.size), r.subList(1, r.size))
 	}
 }
