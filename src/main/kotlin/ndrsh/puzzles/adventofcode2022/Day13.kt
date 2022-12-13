@@ -17,7 +17,6 @@ fun main(args: Array<String>) {
 }
 
 fun inOrder(l: MutableList<Char>, r: MutableList<Char>): Boolean {
-	fun rec(ldrop: Int, rdrop: Int) = inOrder(l.subList(ldrop, l.size), r.subList(rdrop, r.size))
 	fun MutableList<Char>.addBrackets(len: Int) = apply { add(len, ']'); add(0, '[') }
 	fun List<Char>.num(): Int? = if (!this.first().isDigit()) null else this.takeWhile { it.isDigit() }.joinToString("").toInt()
 	
@@ -27,8 +26,8 @@ fun inOrder(l: MutableList<Char>, r: MutableList<Char>): Boolean {
 	return when {
 		l[0] == ']' && r[0] != ']'         -> true
 		l[0] != ']' && r[0] == ']'         -> false
-		l.num() == (r.num() ?: -1)         -> rec(l.num().toString().length, r.num().toString().length)
+		l.num() == (r.num() ?: -1)         -> inOrder(l.subList(l.num().toString().length, l.size), r.subList(r.num().toString().length, r.size))
 		l.num() != null && r.num() != null -> l.num()!! < r.num()!!
-		else                               -> rec(1, 1)
+		else                               -> inOrder(l.subList(1, l.size), r.subList(1, r.size))
 	}
 }
