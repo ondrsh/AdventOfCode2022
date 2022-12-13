@@ -33,18 +33,16 @@ private fun solve(lines: List<String>, part1: Boolean) {
 	}
 	val product = monkeys.map { it.divBy }.reduce(Long::times)
 	
-	fun Monkey.handle() {
-		while (items.isNotEmpty()) {
-			val item = items.removeFirst()
-			val v = op(item)/k
-			val target = if (v%divBy == 0L) monkeys[ifTrue] else monkeys[ifFalse]
-			target.items.add(v%product)
-			nHandled++
-		}
-	}
-	
 	repeat(n) {
-		monkeys.forEach { it.handle() }
+		monkeys.forEach {
+			while (it.items.isNotEmpty()) {
+				val item = it.items.removeFirst()
+				val v = it.op(item)/k
+				val target = if (v%it.divBy == 0L) monkeys[it.ifTrue] else monkeys[it.ifFalse]
+				target.items.add(v%product)
+				it.nHandled++
+			}
+		}
 	}
 	
 	val ans = monkeys.map { it.nHandled }
