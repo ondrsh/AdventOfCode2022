@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
 	val (sandStart, cols) = 500 to 1000
 	var (ans1, ans2) = 0 to 0
 	
-	// mapping each point p to an integer k where p.x = k%cols and p.y = k/cols
+	// mapping each point p to an integer k where p_x = k%cols and p_y = k/cols
 	val paths: List<List<Int>> = lines.map { it.split(" -> ").map { it.split(",").map { it.toInt() }.let { it.first() + cols*it.last() } } }
 	val rows = paths.flatten().max()/cols + 2
 	val points = BooleanArray((rows + 1)*(cols + 1))
