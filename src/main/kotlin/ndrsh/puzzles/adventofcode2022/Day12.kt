@@ -2,8 +2,8 @@ package ndrsh.puzzles.adventofcode2022
 
 import java.io.File
 
-val arr = File("/home/ndrsh/software/adventofcode/2022/12").readLines().joinToString("").toCharArray()
-val cols = 114
+private val arr = File("/home/ndrsh/software/adventofcode/2022/12").readLines().joinToString("").toCharArray()
+private val cols = 114
 
 fun adjs(k: Int) = buildList {
 	if (k - cols > 0) add(k - cols)
