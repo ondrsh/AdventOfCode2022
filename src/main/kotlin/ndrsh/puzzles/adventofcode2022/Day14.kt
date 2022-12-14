@@ -7,15 +7,27 @@ fun main(args: Array<String>) {
 	val (sandStart, cols) = 500 to 1000
 	var (ans1, ans2) = 0 to 0
 	
-	val paths = lines.toPaths(cols)
-	val points = paths.toPoints(cols)
+	// map each point p to an integer k = p_n + p_m * cols
+	fun List<Int>.toIntPoint() = this.first() + this.last() * cols
+	fun getPointsBetween(a: Int, b: Int) = (a..b step if (a%cols == b%cols) cols else 1)
+	
+	val paths = lines.map { it.split(" -> ").map { it.getCoords().toIntPoint() } }
+	val points = paths.flatMap { it.windowed(2).flatMap { getPointsBetween(it.min(), it.max()) } }.toMutableSet()
 	val max = points.max()
 	val rows = max/cols + 2
-	val field = BooleanArray((rows+1)*(cols + 1)) { it in points }
-	field.addBottom(rows, cols)
+	val field = BooleanArray((rows + 1)*(cols + 1)) { it in points }
+	val bottomLine = rows*cols until (rows + 1)*cols
+	for (p in bottomLine) field[p] = true
+	
+	tailrec fun landingPos(k: Int, field: BooleanArray): Int = if (k > field.size) -1 else when {
+		!field[k + cols]     -> landingPos(k + cols, field)
+		!field[k + cols - 1] -> landingPos(k + cols - 1, field)
+		!field[k + cols + 1] -> landingPos(k + cols + 1, field)
+		else                 -> { field[k] = true; k }
+	}
 	
 	while (field[sandStart] == false) {
-		val target = landingPos(sandStart, field, cols)
+		val target = landingPos(sandStart, field)
 		if (target > max && ans1 == 0) ans1 = ans2
 		ans2++
 	}
@@ -23,17 +35,4 @@ fun main(args: Array<String>) {
 	println(ans2)
 }
 
-tailrec fun landingPos(k: Int, field: BooleanArray, cols: Int): Int = if (k > field.size) -1 else when {
-	!field[k + cols]     -> landingPos(k + cols, field, cols)
-	!field[k + cols - 1] -> landingPos(k + cols - 1, field, cols)
-	!field[k + cols + 1] -> landingPos(k + cols + 1, field, cols)
-	else                 -> { field[k] = true; k }
-}
-
-// mapping each point p to an integer k = p_x + p_y * cols
-fun List<String>.toPaths(cols: Int) = map { it.split(" -> ").map { it.split(",").map { it.toInt() }.let { it.first() + it.last()*cols } } }
-
-// for each path, take 2 points, sort them and add every point in between them. continue until path ends
-fun List<List<Int>>.toPoints(cols: Int) = flatMapTo(mutableSetOf()) { it.windowed(2).flatMap { it.sorted().let { (l, h) -> (l..h step if (l%cols == h%cols) cols else 1) } } }
-
-fun BooleanArray.addBottom(rows: Int, cols: Int) = (rows*cols until (rows + 1)*cols).forEach { set(it, true) }
+fun String.getCoords(): List<Int> = replace(Regex("[^0-9]+"), ";").split(";").filterNot { it.isEmpty() }.map { it.toInt() }
