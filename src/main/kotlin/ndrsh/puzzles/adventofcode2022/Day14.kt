@@ -4,7 +4,7 @@ import java.io.File
 
 fun main(args: Array<String>) {
 	val lines = File("/home/ndrsh/software/adventofcode/2022/14").readLines()
-	val (sandStart, cols) = 500 to 700
+	val (sandStart, cols) = 500 to 1000
 	var (ans1, ans2) = 0 to 0
 	
 	// mapping each point p to an integer k where p.x = k%cols and p.y = k/cols
