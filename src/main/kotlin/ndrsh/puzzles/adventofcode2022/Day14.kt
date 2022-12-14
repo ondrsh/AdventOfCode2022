@@ -27,14 +27,12 @@ fun main(args: Array<String>) {
 	while (true) {
 		var k = sandStart
 		while (k < cols*rows) {
-			k += cols + if (points[k + cols]) {
-				if (points[k + cols - 1]) {
-					if (points[k + cols + 1]) {
-						points[k] = true
-						break
-					} else 1
-				} else -1
-			} else 0
+			k += when {
+				!points[k + cols]     -> cols
+				!points[k + cols - 1] -> cols - 1
+				!points[k + cols + 1] -> cols + 1
+				else                  -> { points[k] = true; break }
+			}
 		}
 		if (k > last && ans1 == 0) ans1 = ans2
 		if (points[sandStart]) break
