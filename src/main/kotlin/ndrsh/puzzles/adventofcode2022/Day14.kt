@@ -10,32 +10,25 @@ fun main(args: Array<String>) {
 	// mapping each point p to an integer k where p_x = k%cols and p_y = k/cols
 	val paths: List<List<Int>> = lines.map { it.split(" -> ").map { it.split(",").map { it.toInt() }.let { it.first() + cols*it.last() } } }
 	val rows = paths.flatten().max()/cols + 2
-	val points = BooleanArray((rows + 1)*(cols + 1))
-	
-	paths.forEach {
-		it.windowed(2).forEach {
-			val (l, h) = it.sorted()
-			val range = if (l%cols != h%cols) l..h else l..h step cols
-			range.forEach { points[it] = true }
-		}
-	}
-	
-	val last = points.indices.filter { points[it] }.max()
+	// for each path, take 2 points, sort them and add every point in between them. continue until path ends.
+	val points = paths.flatMapTo(mutableSetOf()) { it.windowed(2).flatMap { it.sorted().let { (l, h) -> (l..h step if (l%cols == h%cols) cols else 1).toList() } } }
+	val field = BooleanArray((rows + 1)*(cols + 1)) { it in points }
+	val lowest = points.max()
 	val bottom = (rows*cols until (rows + 1)*cols)
-	bottom.forEach { points[it] = true }
+	bottom.forEach { field[it] = true }
 	
 	while (true) {
 		var k = sandStart
 		while (k < cols*rows) {
 			k += when {
-				!points[k + cols]     -> cols
-				!points[k + cols - 1] -> cols - 1
-				!points[k + cols + 1] -> cols + 1
-				else                  -> { points[k] = true; break }
+				!field[k + cols]     -> cols
+				!field[k + cols - 1] -> cols - 1
+				!field[k + cols + 1] -> cols + 1
+				else                 -> { field[k] = true; break }
 			}
 		}
-		if (k > last && ans1 == 0) ans1 = ans2
-		if (points[sandStart]) break
+		if (k > lowest && ans1 == 0) ans1 = ans2
+		if (field[sandStart]) break
 		ans2++
 	}
 	println(ans1)
