@@ -10,8 +10,9 @@ fun main(args: Array<String>) {
 	// mapping each point p to an integer k where p_x = k%cols and p_y = k/cols
 	val paths: List<List<Int>> = lines.map { it.split(" -> ").map { it.split(",").map { it.toInt() }.let { it.first() + cols*it.last() } } }
 	val rows = paths.flatten().max()/cols + 2
-	// for each path, take 2 points, sort them and add every point in between them. continue until path ends.
-	val points = paths.flatMapTo(mutableSetOf()) { it.windowed(2).flatMap { it.sorted().let { (l, h) -> (l..h step if (l%cols == h%cols) cols else 1).toList() } } }
+	
+	// for each path, take 2 points, sort them and add every point in between them. continue until path ends
+	val points = paths.flatMapTo(mutableSetOf()) { it.windowed(2).flatMap { it.sorted().let { (l, h) -> (l..h step if (l%cols == h%cols) cols else 1) } } }
 	val field = BooleanArray((rows + 1)*(cols + 1)) { it in points }
 	val lowest = points.max()
 	val bottom = (rows*cols until (rows + 1)*cols)
