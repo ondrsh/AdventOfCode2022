@@ -3,13 +3,13 @@ package ndrsh.puzzles.adventofcode2022
 import java.io.File
 
 private val arr = File("/home/ndrsh/software/adventofcode/2022/12").readLines().joinToString("").toCharArray()
-private val cols = 114
+private val n = 114
 
 fun adjs(k: Int) = buildList {
-	if (k - cols > 0) add(k - cols)
-	if (k + cols < arr.size) add(k + cols)
-	if (k%cols != 0) add(k - 1)
-	if (k%cols != cols - 1) add(k + 1)
+	if (k - n > 0) add(k - n)
+	if (k + n < arr.size) add(k + n)
+	if (k%n != 0) add(k - 1)
+	if (k%n != n - 1) add(k + 1)
 }
 
 fun main(args: Array<String>) {

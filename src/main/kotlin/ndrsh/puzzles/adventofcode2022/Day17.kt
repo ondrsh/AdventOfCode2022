@@ -5,16 +5,16 @@ import java.io.File
 // positions are represented as ints, a position with coords x,y (where y increases as rocks fall) is represented as k = y*cols + x
 typealias Rocks = List<Int>
 
-val m = 20_000
-val n = 7
-val bottom = m*n
+val rows = 20_000
+val cols = 7
+val bottom = rows*cols
 val line = File("/home/ndrsh/software/adventofcode/2022/17").readLines().first()
 
 val rockVecs = listOf(listOf(0, 1, 2, 3),
-                      listOf(1, 1 - n, 1 - 2*n, 2 - n, -n),
-                      listOf(0, 1, 2, 2 - n, 2 - 2*n),
-                      listOf(0, -n, -2*n, -3*n),
-                      listOf(0, 1, -n, -n + 1))
+                      listOf(1, 1 - cols, 1 - 2*cols, 2 - cols, -cols),
+                      listOf(0, 1, 2, 2 - cols, 2 - 2*cols),
+                      listOf(0, -cols, -2*cols, -3*cols),
+                      listOf(0, 1, -cols, -cols + 1))
 
 fun main(args: Array<String>) {
 	val ans1 = State(2022L).simulate()
@@ -28,7 +28,7 @@ fun State.thirdCycleEnd() = step == line.length*3
 
 // after the first cycle through the input, the state repeats each cycle, but we wait 2 cycles instead of 1 until we forward because line.length could be odd
 tailrec fun State.simulate(): Long {
-	if (rockCount == target) return m - row + heightToAdd
+	if (rockCount == target) return rows - row + heightToAdd
 	if (firstCycleEnd()) save = Save(rockCount, row)
 	return if (thirdCycleEnd() && target != 2022L) forward().simulate()
 	else updateRocks().simulate()
@@ -49,8 +49,8 @@ fun State.updateRocks() = apply {
 	else if (rocks.canFall()) rocks.fall()
 	else {
 		rocks.forEach { taken[it] = true }
-		row = minOf(row, rocks.min()/n)
-		rockVecs[(++rockCount%5).toInt()].map { it + getSpawningPoint(row*n) }
+		row = minOf(row, rocks.min()/cols)
+		rockVecs[(++rockCount%5).toInt()].map { it + getSpawningPoint(row*cols) }
 	}
 	step++
 }
@@ -59,16 +59,16 @@ data class Save(val rockCount: Long = 0L, val row: Int = 0)
 
 data class State(val target: Long,
                  var rocks: Rocks = rockVecs.first().map { it + getSpawningPoint(bottom) },
-                 val taken: BooleanArray = BooleanArray((m + 1)*n),
+                 val taken: BooleanArray = BooleanArray((rows + 1)*cols),
                  var rockCount: Long = 0,
-                 var row: Int = m,
+                 var row: Int = rows,
                  var step: Int = 1,
                  var heightToAdd: Long = 0L,
                  var save: Save = Save()) {
-	fun Rocks.left() = if (any { it%n == 0 || taken[it - 1] }) this else map { it - 1 }
-	fun Rocks.right() = if (any { it%n == n - 1 || taken[it + 1] }) this else map { it + 1 }
-	fun Rocks.canFall() = none { it + n > m*n || taken[it + n] }
-	fun Rocks.fall() = map { it + n }
+	fun Rocks.left() = if (any { it%cols == 0 || taken[it - 1] }) this else map { it - 1 }
+	fun Rocks.right() = if (any { it%cols == cols - 1 || taken[it + 1] }) this else map { it + 1 }
+	fun Rocks.canFall() = none { it + cols > rows*cols || taken[it + cols] }
+	fun Rocks.fall() = map { it + cols }
 }
 
-fun getSpawningPoint(initial: Int) = (initial/n - 4)*n + 2
+fun getSpawningPoint(initial: Int) = (initial/cols - 4)*cols + 2
