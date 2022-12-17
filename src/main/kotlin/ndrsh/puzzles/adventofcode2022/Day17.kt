@@ -18,7 +18,7 @@ val rockVecs = listOf(listOf(0, 1, 2, 3),
 
 fun main(args: Array<String>) {
 	val ans1 = State(2022L).simulate()
-	val ans2 = State(1000000000000L).simulate()
+	val ans2 = State(1000000000000L).simulate()     // runs in 1ms
 	println(ans1)
 	println(ans2)
 }
@@ -26,7 +26,10 @@ fun main(args: Array<String>) {
 fun State.firstCycleEnd() = step == line.length
 fun State.thirdCycleEnd() = step == line.length*3
 
-// after the first cycle through the input, the state repeats each cycle, but we wait 2 cycles instead of 1 until we forward because line.length could be odd
+/*
+ * after the first run through the input, the state repeats each input cycle.
+ * but after the first run, instead of waiting 1 cycle before forwarding, we wait 2 because line.length could be odd.
+ */
 tailrec fun State.simulate(): Long {
 	if (rockCount == target) return rows - row + heightToAdd
 	if (firstCycleEnd()) save = Save(rockCount, row)
