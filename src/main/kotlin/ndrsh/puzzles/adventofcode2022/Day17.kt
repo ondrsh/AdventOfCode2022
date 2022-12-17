@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
 fun State.firstCycleEnd() = step == line.length
 fun State.thirdCycleEnd() = step == line.length*3
 
-// state repeats after each cycle through input, but we wait 2 cycles until we forward because line.length could be odd
+// after the first cycle through the input, the state repeats each cycle, but we wait 2 cycles instead of 1 until we forward because line.length could be odd
 tailrec fun State.simulate(): Long {
 	if (rockCount == target) return m - row + heightToAdd
 	if (firstCycleEnd()) save = Save(rockCount, row)
