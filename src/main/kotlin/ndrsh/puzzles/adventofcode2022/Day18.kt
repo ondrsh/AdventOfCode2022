@@ -5,23 +5,23 @@ import java.io.File
 fun main(args: Array<String>) {
 	val lines = File("/home/ndrsh/software/adventofcode/2022/18").readLines()
 	val cubes = lines.map { it.split(",").map { it.toInt() }.let { (x, y, z) -> Point(x, y, z) } }.toSet()
+	
 	val xRange = cubes.minOf { it.x } until cubes.maxOf { it.x }
 	val yRange = cubes.minOf { it.y } until cubes.maxOf { it.y }
 	val zRange = cubes.minOf { it.z } until cubes.maxOf { it.y }
+	fun Point.outOfRange() = x !in xRange || y !in yRange || z !in zRange
 	
-	val allPoints = xRange.flatMap { x -> yRange.flatMap { y -> zRange.map { z-> Point(x, y, z) } } }
+	val allPoints = xRange.flatMap { x -> yRange.flatMap { y -> zRange.map { z -> Point(x, y, z) } } }
 	val trapped = allPoints.toMutableSet()
 	
-	tailrec fun removeTrapped(start: Point, cur: Point = start, seen: Set<Point> = setOf(start)) {
-		if (cur.x !in xRange || cur.y !in yRange || cur.z !in zRange) {
-			trapped.removeAll(seen + cur)
+	tailrec fun Point.removeTrapped(start: Point = this, seen: Set<Point> = setOf(start)) {
+		if (outOfRange()) trapped.removeAll(seen + this)
+		else adjacents().filter { it !in cubes && it !in seen }.forEach {
+			return it.removeTrapped(start, seen + this)
 		}
-		else cur.adjacents()
-				.filter { it !in cubes && it !in seen }
-				.forEach { return removeTrapped(start, it, seen + cur)}
 	}
 	
-	allPoints.forEach { removeTrapped(it) }
+	allPoints.forEach { it.removeTrapped() }
 	
 	val ans1 = cubes.sumOf { it.adjacents().count { it !in cubes } }
 	val ans2 = cubes.sumOf { it.adjacents().count { it !in cubes && it !in trapped } }
