@@ -14,14 +14,14 @@ fun main(args: Array<String>) {
 	val allPoints = xRange.flatMap { x -> yRange.flatMap { y -> zRange.map { z -> Point(x, y, z) } } }
 	val trapped = allPoints.toMutableSet()
 	
-	tailrec fun Point.removeTrapped(start: Point = this, seen: Set<Point> = setOf(start)) {
+	tailrec fun Point.removeFromTrapped(start: Point = this, seen: Set<Point> = setOf(start)) {
 		if (outOfRange()) trapped.removeAll(seen + this)
 		else adjacents().filter { it !in cubes && it !in seen }.forEach {
-			return it.removeTrapped(start, seen + this)
+			return it.removeFromTrapped(start, seen + this)
 		}
 	}
 	
-	allPoints.forEach { it.removeTrapped() }
+	allPoints.forEach { it.removeFromTrapped() }
 	
 	val ans1 = cubes.sumOf { it.adjacents().count { it !in cubes } }
 	val ans2 = cubes.sumOf { it.adjacents().count { it !in cubes && it !in trapped } }
