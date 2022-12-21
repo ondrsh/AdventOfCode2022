@@ -18,28 +18,28 @@ fun main(args: Array<String>) {
         }
     }
     
-    fun goDown(cur: String, trail: List<String>): Pair<Long, List<String>> {
-        return if (cur in nums) {
-            Pair(nums[cur]!!, if (cur == "humn") trail + "humn" else listOf())
-        } else {
+    var trailToHuman = listOf<String>()
+    fun goDown(cur: String, trail: List<String> = listOf()): Long {
+        if (cur == "humn") trailToHuman = trail + "humn"
+        return if (cur in nums) nums[cur]!!
+        else {
             val (left, right) = children[cur]!!
             val k1 = goDown(left, trail + cur)
             val k2 = goDown(right, trail + cur)
-            val res = when (ops[cur]!!) {
-                '+'  -> k1.first + k2.first
-                '-'  -> k1.first - k2.first
-                '*'  -> k1.first*k2.first
-                else -> k1.first/k2.first
+            nums[left] = k1
+            nums[right] = k2
+            return when (ops[cur]!!) {
+                '+'  -> k1 + k2
+                '-'  -> k1 - k2
+                '*'  -> k1*k2
+                else -> k1/k2
             }
-            nums[left] = k1.first
-            nums[right] = k2.first
-            return Pair(res, k1.second + k2.second)
         }
     }
     
-    val (ans1, trail) = goDown("root", listOf())
-    val toEqual = nums[children["root"]!!.other(trail[1])]!!
-    val ans2 = trail.drop(1).windowed(2).fold(initial = toEqual) { acc, (cur, next) ->
+    val ans1 = goDown("root")
+    val toEqual = nums[children["root"]!!.other(trailToHuman[1])]!!
+    val ans2 = trailToHuman.drop(1).windowed(2).fold(initial = toEqual) { acc, (cur, next) ->
         val other = nums[children[cur]!!.other(next)]!!
         val isLeft = children[cur]?.first == next
         when (ops[cur]!!) {
