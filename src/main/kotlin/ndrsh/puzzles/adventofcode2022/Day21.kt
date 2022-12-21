@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
             val k2 = goDown(right, trail + cur)
             nums[left] = k1
             nums[right] = k2
-            return when (ops[cur]!!) {
+            when (ops[cur]!!) {
                 '+'  -> k1 + k2
                 '-'  -> k1 - k2
                 '*'  -> k1*k2
