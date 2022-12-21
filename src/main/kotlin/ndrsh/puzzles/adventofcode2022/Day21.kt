@@ -41,12 +41,12 @@ fun main(args: Array<String>) {
     val toEqual = nums[children["root"]!!.other(trailToHuman.first())]!!
     val ans2 = trailToHuman.windowed(2).fold(initial = toEqual) { acc, (cur, next) ->
         val other = nums[children[cur]!!.other(next)]!!
-        val isLeft = children[cur]?.first == next
+        val isLeft = children[cur]?.second == next
         when (ops[cur]!!) {
             '+'  -> acc - other
-            '-'  -> if (isLeft) acc + other else other - acc
+            '-'  -> if (isLeft) other - acc else acc + other
             '*'  -> acc/other
-            else -> if (isLeft) acc*other else other/acc
+            else -> if (isLeft) other/acc else acc*other
         }
     }
     
