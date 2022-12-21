@@ -19,6 +19,7 @@ fun main(args: Array<String>) {
     }
     
     var trailToHuman = listOf<String>()
+    
     fun goDown(cur: String, trail: List<String> = listOf()): Long {
         if (cur == "humn") trailToHuman = trail.drop(1) + "humn"
         return if (cur in nums) nums[cur]!!
@@ -50,6 +51,6 @@ fun main(args: Array<String>) {
         }
     }
     
-    println("ans1: $ans1")
-    println("ans2: $ans2")
+    println(ans1)
+    println(ans2)
 }
