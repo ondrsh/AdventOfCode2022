@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
     
     var trailToHuman = listOf<String>()
     fun goDown(cur: String, trail: List<String> = listOf()): Long {
-        if (cur == "humn") trailToHuman = trail + "humn"
+        if (cur == "humn") trailToHuman = trail.drop(1) + "humn"
         return if (cur in nums) nums[cur]!!
         else {
             val (left, right) = children[cur]!!
@@ -38,8 +38,8 @@ fun main(args: Array<String>) {
     }
     
     val ans1 = goDown("root")
-    val toEqual = nums[children["root"]!!.other(trailToHuman[1])]!!
-    val ans2 = trailToHuman.drop(1).windowed(2).fold(initial = toEqual) { acc, (cur, next) ->
+    val toEqual = nums[children["root"]!!.other(trailToHuman.first())]!!
+    val ans2 = trailToHuman.windowed(2).fold(initial = toEqual) { acc, (cur, next) ->
         val other = nums[children[cur]!!.other(next)]!!
         val isLeft = children[cur]?.first == next
         when (ops[cur]!!) {
