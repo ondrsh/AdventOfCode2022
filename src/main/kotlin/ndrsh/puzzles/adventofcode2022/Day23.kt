@@ -28,7 +28,8 @@ fun main(args: Array<String>) {
     val toFrom = mutableMapOf<Int, Int>()
     
     // tweaked this for maximum performance. if an elf moves from a to b, set toFrom[b] = a.
-    // if there is a conflict later, set toFrom[b] = -1. finally, update the elves
+    // however, if b is already present in toFrom, remove it. this works because only 2 elves
+    // can ever choose the same spot. finally, update the elves by iterating through toFrom.
     fun simulate(): Int {
         toFrom.clear()
         for (e in elves) {
