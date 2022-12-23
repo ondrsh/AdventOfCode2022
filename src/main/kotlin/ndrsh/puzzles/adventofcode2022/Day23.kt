@@ -7,14 +7,15 @@ fun main(args: Array<String>) {
     val (mAdd, nAdd) = 500 to 500
     val cols = lines[0].length + nAdd
     val elves = mutableSetOf<Int>()
-    lines.forEachIndexed { m, l -> l.forEachIndexed { n, c -> if (c == '#') elves.add((m + mAdd)*cols + n + nAdd/2) } }
+    lines.forEachIndexed { m, l -> l.forEachIndexed { n, c -> if (c == '#') elves.add((m + mAdd/2)*cols + n + nAdd/2) } }
     val adjacents = intArrayOf(-cols, -cols + 1, 1, 1 + cols, cols, cols - 1, -1, -1 - cols)
     val dirs = listOf(intArrayOf(-cols, -cols + 1, -cols - 1),
                       intArrayOf(cols, cols + 1, cols - 1),
                       intArrayOf(-1, -1 - cols, -1 + cols),
                       intArrayOf(1, 1 - cols, 1 + cols))
     
-    var (ans1, ans2) = 0 to 0
+    var ans1 = 0
+    var ans2 = 0
     var dirStart = 0
     val fromTo = mutableMapOf<Int, Int>()
     val toFrom = mutableMapOf<Int, Int>()
