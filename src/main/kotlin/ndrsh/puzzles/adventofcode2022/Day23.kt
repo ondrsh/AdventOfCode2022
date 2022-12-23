@@ -4,14 +4,14 @@ import java.io.File
 
 fun main(args: Array<String>) {
     val lines = File("/home/ndrsh/software/adventofcode/2022/23").readLines()
-    val (rows, cols) = 500 to 500
+    val n = 500
     val elves = mutableSetOf<Int>()
-    lines.forEachIndexed { m, l -> l.forEachIndexed { n, c -> if (c == '#') elves.add((m + rows/2)*cols + n + cols/2) } }
-    val adjacents = intArrayOf(-cols, -cols + 1, 1, 1 + cols, cols, cols - 1, -1, -1 - cols)
-    val dirs = listOf(intArrayOf(-cols, -cols + 1, -cols - 1),
-                      intArrayOf(cols, cols + 1, cols - 1),
-                      intArrayOf(-1, -1 - cols, -1 + cols),
-                      intArrayOf(1, 1 - cols, 1 + cols))
+    lines.forEachIndexed { y, l -> l.forEachIndexed { x, c -> if (c == '#') elves.add(y*n + x + n/2) } }
+    val adjacents = intArrayOf(-n, -n + 1, 1, 1 + n, n, n - 1, -1, -1 - n)
+    val dirs = listOf(intArrayOf(-n, -n + 1, -n - 1),
+                      intArrayOf(n, n + 1, n - 1),
+                      intArrayOf(-1, -1 - n, -1 + n),
+                      intArrayOf(1, 1 - n, 1 + n))
     
     var ans1 = 0
     var ans2 = 0
@@ -57,7 +57,7 @@ fun main(args: Array<String>) {
     
     // benchmarked at 182ms on a 12900k
     while (simulate() > 0) {
-        if (ans2 == 10) ans1 = elves.fieldSize(cols) - elves.count()
+        if (ans2 == 10) ans1 = elves.fieldSize(n) - elves.count()
     }
     println(ans1)
     println(ans2)
