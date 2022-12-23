@@ -4,10 +4,9 @@ import java.io.File
 
 fun main(args: Array<String>) {
     val lines = File("/home/ndrsh/software/adventofcode/2022/23").readLines()
-    val (mAdd, nAdd) = 500 to 500
-    val cols = lines[0].length + nAdd
+    val (rows, cols) = 500 to 500
     val elves = mutableSetOf<Int>()
-    lines.forEachIndexed { m, l -> l.forEachIndexed { n, c -> if (c == '#') elves.add((m + mAdd/2)*cols + n + nAdd/2) } }
+    lines.forEachIndexed { m, l -> l.forEachIndexed { n, c -> if (c == '#') elves.add((m + rows/2)*cols + n + cols/2) } }
     val adjacents = intArrayOf(-cols, -cols + 1, 1, 1 + cols, cols, cols - 1, -1, -1 - cols)
     val dirs = listOf(intArrayOf(-cols, -cols + 1, -cols - 1),
                       intArrayOf(cols, cols + 1, cols - 1),
