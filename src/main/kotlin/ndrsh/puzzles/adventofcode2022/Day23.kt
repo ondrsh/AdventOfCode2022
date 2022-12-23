@@ -62,8 +62,8 @@ fun main(args: Array<String>) {
     while (simulate() > 0) {
         if (ans2 == 10) ans1 = elves.fieldSize(cols) - elves.count()
     }
-    println("ans1: $ans1")
-    println("ans2: $ans2")
+    println(ans1)
+    println(ans2)
 }
 
 fun Set<Int>.fieldSize(cols: Int) = ((max() - min())/cols + 1)*(maxOf { it.mod(cols) } - minOf { it.mod(cols) } + 1)
