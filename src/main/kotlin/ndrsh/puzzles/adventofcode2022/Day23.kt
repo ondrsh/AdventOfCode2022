@@ -20,14 +20,13 @@ fun main(args: Array<String>) {
     val toFrom = mutableMapOf<Int, Int>()
     val blocked = mutableSetOf<Int>()
     
-    // tweaked this for maximum performance. if an elf moves from a to b, set fromTo[a] = b
-    // and increase elvesMoved by 1. if there is a conflict later, delete that entry and decrease
-    // elvesMoved by 1. in the end, remove all keys from fromTo from elves and add all values
+    // tweaked this for maximum performance. if an elf moves from a to b, set fromTo[a] = b.
+    // if there is a conflict later, delete that entry and add that point to a blocked set.
+    // in the end, update the elves by looking at the fromTo map
     fun simulate(): Int {
         fromTo.clear()
         toFrom.clear()
         blocked.clear()
-        var elvesMoved = 0
         for (e in elves) {
             if (adjacents.any { it + e in elves }) {
                 for (k in 0..3) {
@@ -38,11 +37,9 @@ fun main(args: Array<String>) {
                             val source = toFrom[target]!!
                             fromTo.remove(source)
                             blocked.add(target)
-                            elvesMoved--
                         } else {
                             fromTo[e] = target
                             toFrom[target] = e
-                            elvesMoved++
                         }
                         break
                     }
@@ -55,7 +52,7 @@ fun main(args: Array<String>) {
         }
         dirStart++
         ans2++
-        return elvesMoved
+        return fromTo.size
     }
     
     // benchmarked at 182ms on a 12900k
