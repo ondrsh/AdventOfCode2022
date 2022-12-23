@@ -16,7 +16,7 @@ fun main(args: Array<String>) {
             }
         }
     }
-    val adjacents = intArrayOf(-n, -n + 1, 1, 1 + n, n, n - 1, -1, -1 - n)
+    val adjVecs = intArrayOf(-n, -n + 1, 1, 1 + n, n, n - 1, -1, -1 - n)
     val dirs = listOf(intArrayOf(-n, -n + 1, -n - 1),
                       intArrayOf(n, n + 1, n - 1),
                       intArrayOf(-1, -1 - n, -1 + n),
@@ -32,12 +32,12 @@ fun main(args: Array<String>) {
     fun simulate(): Int {
         toFrom.clear()
         for (e in elves) {
-            if (adjacents.any { taken[it + e] }) {
+            if (adjVecs.any { taken[it + e] }) {
                 for (k in 0..3) {
                     val dir = dirs[(k + dirStart)%4]
                     val target = e + dir[0]
                     if (dir.none { taken[it + e] }) {
-                        if (target in toFrom) toFrom[target] = -1
+                        if (target in toFrom) toFrom.remove(target)
                         else toFrom[target] = e
                         break
                     }
@@ -45,7 +45,6 @@ fun main(args: Array<String>) {
             }
         }
         for (entry in toFrom) {
-            if (entry.value == -1) continue
             elves.add(entry.key)
             taken[entry.key] = true
             elves.remove(entry.value)
