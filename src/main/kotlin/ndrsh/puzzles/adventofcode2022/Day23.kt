@@ -6,7 +6,16 @@ fun main(args: Array<String>) {
     val lines = File("/home/ndrsh/software/adventofcode/2022/23").readLines()
     val n = 500
     val elves = mutableSetOf<Int>()
-    lines.forEachIndexed { y, l -> l.forEachIndexed { x, c -> if (c == '#') elves.add(y*n + x + n/2) } }
+    val taken = BooleanArray(n*n)
+    lines.forEachIndexed { y, line ->
+        line.forEachIndexed { x, c ->
+            if (c == '#') {
+                val k = (y+n/2)*n + x + n/2
+                elves.add(k)
+                taken[k] = true
+            }
+        }
+    }
     val adjacents = intArrayOf(-n, -n + 1, 1, 1 + n, n, n - 1, -1, -1 - n)
     val dirs = listOf(intArrayOf(-n, -n + 1, -n - 1),
                       intArrayOf(n, n + 1, n - 1),
@@ -16,46 +25,38 @@ fun main(args: Array<String>) {
     var ans1 = 0
     var ans2 = 0
     var dirStart = 0
-    val fromTo = mutableMapOf<Int, Int>()
     val toFrom = mutableMapOf<Int, Int>()
-    val blocked = mutableSetOf<Int>()
     
-    // tweaked this for maximum performance. if an elf moves from a to b, set fromTo[a] = b.
-    // if there is a conflict later, delete that entry and add that point to a blocked set.
-    // in the end, update the elves by looking at the fromTo map
+    // tweaked this for maximum performance. if an elf moves from a to b, set toFrom[b] = a.
+    // if there is a conflict later, set toFrom[b] = -1. finally, update the elves
     fun simulate(): Int {
-        fromTo.clear()
         toFrom.clear()
-        blocked.clear()
         for (e in elves) {
-            if (adjacents.any { it + e in elves }) {
+            if (adjacents.any { taken[it + e] }) {
                 for (k in 0..3) {
                     val dir = dirs[(k + dirStart)%4]
                     val target = e + dir[0]
-                    if (target !in blocked && dir.none { it + e in elves }) {
-                        if (target in toFrom) {
-                            val source = toFrom[target]!!
-                            fromTo.remove(source)
-                            blocked.add(target)
-                        } else {
-                            fromTo[e] = target
-                            toFrom[target] = e
-                        }
+                    if (dir.none { taken[it + e] }) {
+                        if (target in toFrom) toFrom[target] = -1
+                        else toFrom[target] = e
                         break
                     }
                 }
             }
         }
-        for (entry in fromTo) {
-            elves.remove(entry.key)
-            elves.add(entry.value)
+        for (entry in toFrom) {
+            if (entry.value == -1) continue
+            elves.add(entry.key)
+            taken[entry.key] = true
+            elves.remove(entry.value)
+            taken[entry.value] = false
         }
         dirStart++
         ans2++
-        return fromTo.size
+        return toFrom.size
     }
     
-    // benchmarked at 182ms on a 12900k
+    // benchmarked at 71ms on a 12900k
     while (simulate() > 0) {
         if (ans2 == 10) ans1 = elves.fieldSize(n) - elves.count()
     }
