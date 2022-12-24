@@ -7,8 +7,8 @@ import java.io.File
 
 fun main(args: Array<String>) {
     val lines = File("/home/ndrsh/software/adventofcode/2022/24").readLines()
-    val cs = lines[0].length - 2
     val rs = lines.size - 2
+    val cs = lines[0].length - 2
     val lcm = lcm(rs.toLong(), cs.toLong()).toInt()
     val freeStates = Array(lcm) { Array(rs) { BooleanArray(cs) { true } } }
     
