@@ -20,6 +20,7 @@ fun main(args: Array<String>) {
     
     var trailToHuman = listOf<String>()
     
+    // save trail when going down so when starting part 2, we already have the trail to human
     fun goDown(cur: String, trail: List<String> = listOf()): Long {
         if (cur == "humn") trailToHuman = trail.drop(1) + "humn"
         return if (cur in nums) nums[cur]!!
